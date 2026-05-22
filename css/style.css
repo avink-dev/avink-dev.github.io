@@ -1184,6 +1184,11 @@ body.motion-ready .hero-backdrop {
     z-index: 2;
 }
 
+.profile-photo.is-hidden,
+.about-photo.is-hidden {
+    display: none;
+}
+
 .profile-photo-fallback,
 .about-photo-fallback {
     position: absolute;
