@@ -209,10 +209,12 @@ revealElements.forEach(el => revealObserver.observe(el));
 
 // ——— Profile photo fallback ———
 document.querySelectorAll('[data-profile-photo]').forEach(photo => {
-    const remove = () => photo.remove();
+    const showFallback = () => {
+        photo.classList.add('is-hidden');
+        photo.removeAttribute('src');
+    };
 
-    photo.addEventListener('error', remove);
-    if (photo.complete && photo.naturalWidth === 0) remove();
+    photo.addEventListener('error', showFallback);
 });
 
 // ——— Smooth anchor scroll ———
