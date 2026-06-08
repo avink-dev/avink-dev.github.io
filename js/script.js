@@ -6,7 +6,7 @@ const navLinks = document.getElementById('navLinks');
 const navOverlay = document.getElementById('navOverlay');
 const navLinkElements = document.querySelectorAll('.nav-link');
 const sections = document.querySelectorAll('section[id]');
-const revealElements = document.querySelectorAll('[data-animate="reveal"]');
+let scrollRevealReady = false;
 const contactForm = document.getElementById('contactForm');
 const backToTop = document.getElementById('backToTop');
 const loader = document.getElementById('loader');
@@ -71,6 +71,7 @@ function finishLoader() {
     setTimeout(() => {
         document.body.classList.remove('is-loading');
         document.body.classList.add('is-loaded');
+        initScrollReveals();
     }, prefersReducedMotion ? 0 : 480);
 }
 
@@ -189,23 +190,151 @@ window.addEventListener('scroll', () => {
 setNavScrolled();
 setActiveLink();
 
-// ——— Scroll reveal ———
-const revealObserver = new IntersectionObserver(
-    entries => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('is-visible');
-                revealObserver.unobserve(entry.target);
+// ——— Heavy scroll reveal (runs after loader) ———
+function applyScrollAnimationPresets() {
+    const staggerGroups = [
+        '.timeline',
+        '.skills-grid',
+        '.education-grid',
+        '.impact-grid',
+        '.contact-cards',
+        '.achievements-grid'
+    ];
+
+    staggerGroups.forEach(selector => {
+        document.querySelectorAll(selector).forEach(group => {
+            const items = group.querySelectorAll(':scope > [data-animate]');
+            items.forEach((item, index) => {
+                if (!item.style.getPropertyValue('--reveal-delay')) {
+                    item.style.setProperty('--reveal-delay', `${index * 130}ms`);
+                }
+            });
+        });
+    });
+
+    document.querySelectorAll('.timeline-item[data-animate]').forEach((item, index) => {
+        item.setAttribute('data-animate', index % 2 === 0 ? 'reveal-left' : 'reveal-right');
+        item.style.setProperty('--reveal-duration', '1.15s');
+    });
+
+    document.querySelectorAll('.skill-block[data-animate]').forEach(block => {
+        block.setAttribute('data-animate', 'reveal-flip');
+        block.style.setProperty('--reveal-duration', '1.1s');
+    });
+
+    document.querySelectorAll('.education-card[data-animate]').forEach(card => {
+        card.setAttribute('data-animate', 'reveal-scale');
+    });
+
+    document.querySelectorAll('.contact-card[data-animate], .contact-form-wrapper[data-animate]').forEach(card => {
+        card.setAttribute('data-animate', 'reveal-scale');
+    });
+}
+
+function revealInViewport(elements) {
+    elements.forEach(el => {
+        const rect = el.getBoundingClientRect();
+        const inView = rect.top < window.innerHeight * 0.92 && rect.bottom > window.innerHeight * 0.08;
+        if (inView) {
+            el.classList.add('is-visible');
+        }
+    });
+}
+
+function initScrollReveals() {
+    if (scrollRevealReady) return;
+    scrollRevealReady = true;
+
+    applyScrollAnimationPresets();
+
+    const revealElements = document.querySelectorAll('[data-animate]');
+    const scrollSections = document.querySelectorAll('.section, .impact-panel');
+    const timeline = document.querySelector('.timeline');
+
+    if (prefersReducedMotion) {
+        revealElements.forEach(el => el.classList.add('is-visible'));
+        scrollSections.forEach(section => section.classList.add('is-in-view'));
+        if (timeline) timeline.classList.add('is-line-drawn');
+        return;
+    }
+
+    const revealObserver = new IntersectionObserver(
+        entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        },
+        {
+            threshold: [0, 0.12, 0.25],
+            rootMargin: '0px 0px -40px 0px'
+        }
+    );
+
+    revealElements.forEach(el => revealObserver.observe(el));
+
+    const sectionObserver = new IntersectionObserver(
+        entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-in-view');
+                    sectionObserver.unobserve(entry.target);
+                }
+            });
+        },
+        {
+            threshold: 0.05,
+            rootMargin: '80px 0px -60px 0px'
+        }
+    );
+
+    scrollSections.forEach(section => sectionObserver.observe(section));
+
+    if (timeline) {
+        const timelineObserver = new IntersectionObserver(
+            entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-line-drawn');
+                        timelineObserver.unobserve(entry.target);
+                    }
+                });
+            },
+            { threshold: 0.1, rootMargin: '0px 0px -80px 0px' }
+        );
+
+        timelineObserver.observe(timeline);
+    }
+
+    // Fallback: reveal anything already on screen after loader
+    requestAnimationFrame(() => {
+        revealInViewport(revealElements);
+        scrollSections.forEach(section => {
+            const rect = section.getBoundingClientRect();
+            if (rect.top < window.innerHeight * 0.85) {
+                section.classList.add('is-in-view');
             }
         });
-    },
-    {
-        threshold: 0.12,
-        rootMargin: '0px 0px -40px 0px'
-    }
-);
+        if (timeline) {
+            const rect = timeline.getBoundingClientRect();
+            if (rect.top < window.innerHeight * 0.9) {
+                timeline.classList.add('is-line-drawn');
+            }
+        }
+    });
 
-revealElements.forEach(el => revealObserver.observe(el));
+    window.addEventListener('scroll', () => {
+        revealInViewport(document.querySelectorAll('[data-animate]:not(.is-visible)'));
+    }, { passive: true });
+}
+
+window.addEventListener('load', () => {
+    if (document.body.classList.contains('is-loaded')) {
+        initScrollReveals();
+    }
+});
 
 // ——— Profile photo fallback ———
 document.querySelectorAll('[data-profile-photo]').forEach(photo => {
