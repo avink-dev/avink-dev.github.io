@@ -26,6 +26,55 @@
     window.addEventListener('scroll', updateScrollProgress, { passive: true });
     window.addEventListener('resize', updateScrollProgress);
 
+    function setupScrollParallax() {
+        if (prefersReducedMotion) return;
+
+        const heroCopy = document.querySelector('.hero-copy');
+        const heroVisual = document.querySelector('.hero-visual');
+        const parallaxSections = document.querySelectorAll('.section .container, .impact-panel .container');
+
+        let ticking = false;
+
+        function updateScrollParallax() {
+            const scrollY = window.scrollY;
+            const vh = window.innerHeight;
+            const heroLimit = vh * 1.1;
+
+            if (scrollY < heroLimit) {
+                const progress = scrollY / heroLimit;
+
+                if (heroCopy) {
+                    heroCopy.style.transform = `translate3d(0, ${scrollY * 0.42}px, 0) scale(${1 - progress * 0.06})`;
+                    heroCopy.style.opacity = String(Math.max(0.25, 1 - progress * 0.85));
+                }
+                if (heroVisual) {
+                    heroVisual.style.transform = `translate3d(0, ${scrollY * 0.22}px, 0) scale(${1 - progress * 0.1}) rotate(${progress * 2}deg)`;
+                    heroVisual.style.opacity = String(Math.max(0.35, 1 - progress * 0.75));
+                }
+            }
+
+            parallaxSections.forEach(section => {
+                const rect = section.getBoundingClientRect();
+                const centerOffset = (rect.top + rect.height * 0.5 - vh * 0.5) / vh;
+                const shift = Math.max(-1, Math.min(1, centerOffset)) * 28;
+                section.style.transform = `translate3d(0, ${shift}px, 0)`;
+            });
+
+            ticking = false;
+        }
+
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                ticking = true;
+                requestAnimationFrame(updateScrollParallax);
+            }
+        }, { passive: true });
+
+        updateScrollParallax();
+    }
+
+    setupScrollParallax();
+
     if (!prefersReducedMotion && finePointer) {
         window.addEventListener('pointermove', event => {
             const x = event.clientX / window.innerWidth - 0.5;
@@ -160,6 +209,8 @@
             }
 
             card.addEventListener('pointermove', event => {
+                if (card.hasAttribute('data-animate') && !card.classList.contains('is-visible')) return;
+
                 const rect = card.getBoundingClientRect();
                 const x = (event.clientX - rect.left) / rect.width;
                 const y = (event.clientY - rect.top) / rect.height;

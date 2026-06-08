@@ -6,6 +6,9 @@
     --duration-fast: 0.22s;
     --duration: 0.42s;
     --duration-slow: 0.65s;
+    --duration-reveal: 1.05s;
+    --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-bounce: cubic-bezier(0.34, 1.45, 0.64, 1);
 
     /* Iron Man palette */
     --im-red: #c41e3a;
@@ -90,6 +93,11 @@ html[data-theme="dark"] {
     .footer::before,
     .skill-meter span,
     .impact-rail span,
+    .section.is-in-view,
+    .impact-panel.is-in-view,
+    .timeline-item.is-visible::before,
+    .timeline::before,
+    .timeline.is-line-drawn::before,
     .profile-systems span::before,
     .hero-role.is-typing::after {
         animation: none;
@@ -100,6 +108,37 @@ html[data-theme="dark"] {
     }
 
     .loader-progress {
+        transition: none;
+    }
+
+    [data-animate] {
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        filter: none;
+        animation: none;
+    }
+
+    .skill-meter span,
+    .impact-rail span {
+        transform: scaleX(1);
+        transition: none;
+    }
+
+    .section.is-in-view,
+    .impact-panel.is-in-view {
+        animation: none;
+        clip-path: none;
+        opacity: 1;
+    }
+
+    .timeline::before {
+        transform: scaleY(1);
+        transition: none;
+    }
+
+    .section-title::after {
+        transform: scaleX(1);
         transition: none;
     }
 }
@@ -159,6 +198,7 @@ body.is-loaded .hero-visual {
     transform-origin: left center;
     background: linear-gradient(90deg, var(--im-red), var(--im-gold), var(--im-arc));
     box-shadow: 0 0 16px rgba(92, 225, 255, 0.45);
+    transition: transform 0.12s linear;
 }
 
 .cursor-glow {
@@ -489,19 +529,214 @@ ul {
     color: var(--accent);
 }
 
-/* ——— Reveal animations (Apple-style fade + lift) ——— */
-[data-animate="reveal"] {
+/* ——— Heavy scroll reveal animations (GPU: opacity + transform) ——— */
+[data-animate] {
     opacity: 0;
-    transform: translateY(20px);
-    transition:
-        opacity var(--duration-slow) var(--ease-out),
-        transform var(--duration-slow) var(--ease-out);
-    transition-delay: var(--reveal-delay, 0ms);
+    visibility: hidden;
+    will-change: transform, opacity, filter;
 }
 
-[data-animate="reveal"].is-visible {
-    opacity: 1;
-    transform: translateY(0);
+[data-animate].is-visible {
+    visibility: visible;
+    animation-duration: var(--reveal-duration, var(--duration-reveal));
+    animation-delay: var(--reveal-delay, 0ms);
+    animation-timing-function: var(--ease-spring);
+    animation-fill-mode: both;
+}
+
+[data-animate="reveal"].is-visible,
+[data-animate="reveal-up"].is-visible {
+    animation-name: scroll-reveal-up;
+}
+
+[data-animate="reveal-left"].is-visible {
+    animation-name: scroll-reveal-left;
+}
+
+[data-animate="reveal-right"].is-visible {
+    animation-name: scroll-reveal-right;
+}
+
+[data-animate="reveal-scale"].is-visible {
+    animation-name: scroll-reveal-scale;
+}
+
+[data-animate="reveal-blur"].is-visible {
+    animation-name: scroll-reveal-blur;
+}
+
+[data-animate="reveal-flip"].is-visible {
+    animation-name: scroll-reveal-flip;
+}
+
+@keyframes scroll-reveal-up {
+    0% {
+        opacity: 0;
+        transform: translate3d(0, 110px, 0) scale(0.88);
+        filter: blur(10px);
+    }
+    65% {
+        opacity: 1;
+        transform: translate3d(0, -14px, 0) scale(1.03);
+        filter: blur(0);
+    }
+    100% {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) scale(1);
+        filter: blur(0);
+    }
+}
+
+@keyframes scroll-reveal-left {
+    0% {
+        opacity: 0;
+        transform: translate3d(-90px, 40px, 0) rotateY(18deg) scale(0.9);
+        filter: blur(8px);
+    }
+    70% {
+        opacity: 1;
+        transform: translate3d(10px, -6px, 0) rotateY(-2deg) scale(1.02);
+        filter: blur(0);
+    }
+    100% {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) rotateY(0) scale(1);
+        filter: blur(0);
+    }
+}
+
+@keyframes scroll-reveal-right {
+    0% {
+        opacity: 0;
+        transform: translate3d(90px, 40px, 0) rotateY(-18deg) scale(0.9);
+        filter: blur(8px);
+    }
+    70% {
+        opacity: 1;
+        transform: translate3d(-10px, -6px, 0) rotateY(2deg) scale(1.02);
+        filter: blur(0);
+    }
+    100% {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) rotateY(0) scale(1);
+        filter: blur(0);
+    }
+}
+
+@keyframes scroll-reveal-scale {
+    0% {
+        opacity: 0;
+        transform: translate3d(0, 60px, 0) scale(0.55) rotate(-4deg);
+        filter: blur(12px);
+    }
+    55% {
+        opacity: 1;
+        transform: translate3d(0, -10px, 0) scale(1.08) rotate(1deg);
+        filter: blur(0);
+    }
+    100% {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) scale(1) rotate(0);
+        filter: blur(0);
+    }
+}
+
+@keyframes scroll-reveal-blur {
+    0% {
+        opacity: 0;
+        transform: translate3d(0, 50px, 0) scale(1.08);
+        filter: blur(22px);
+        letter-spacing: 0.12em;
+    }
+    100% {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) scale(1);
+        filter: blur(0);
+        letter-spacing: 0;
+    }
+}
+
+@keyframes scroll-reveal-flip {
+    0% {
+        opacity: 0;
+        transform: perspective(900px) translate3d(0, 80px, -120px) rotateX(28deg) scale(0.82);
+    }
+    70% {
+        opacity: 1;
+        transform: perspective(900px) translate3d(0, -8px, 0) rotateX(-4deg) scale(1.03);
+    }
+    100% {
+        opacity: 1;
+        transform: perspective(900px) translate3d(0, 0, 0) rotateX(0) scale(1);
+    }
+}
+
+/* Section clip-path wipe on scroll */
+.section.is-in-view,
+.impact-panel.is-in-view {
+    animation: section-wipe-in 1.1s var(--ease-spring) both;
+}
+
+@keyframes section-wipe-in {
+    0% {
+        opacity: 0.35;
+        clip-path: inset(8% 6% 100% 6% round 12px);
+    }
+    100% {
+        opacity: 1;
+        clip-path: inset(0 0 0 0 round 0);
+    }
+}
+
+.section.is-in-view .section-title::after {
+    transform: scaleX(1);
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -0.55rem;
+    width: 100%;
+    height: 4px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--im-red), var(--im-gold), var(--im-arc));
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 1.1s var(--ease-spring);
+    box-shadow: 0 0 18px rgba(92, 225, 255, 0.5);
+}
+
+/* Hero scroll parallax */
+body.is-loaded .hero-copy,
+body.is-loaded .hero-visual {
+    will-change: transform;
+}
+
+.timeline-item.is-visible::before {
+    animation: timeline-node-pop 0.75s var(--ease-bounce) both;
+    animation-delay: var(--reveal-delay, 0ms);
+}
+
+@keyframes timeline-node-pop {
+    0% {
+        opacity: 0;
+        transform: scale(0) rotate(-180deg);
+        box-shadow: 0 0 0 rgba(92, 225, 255, 0);
+    }
+    70% {
+        transform: scale(1.2) rotate(8deg);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) rotate(0);
+        box-shadow: 0 0 20px rgba(92, 225, 255, 0.45);
+    }
+}
+
+.skill-block.is-visible .skill-meter span,
+.impact-card.is-visible .impact-rail span {
+    transform: scaleX(1);
 }
 
 /* ——— Navigation (frosted glass) ——— */
@@ -1438,6 +1673,10 @@ body.motion-ready .hero-backdrop {
     background: linear-gradient(90deg, var(--im-red), var(--im-gold), var(--im-arc));
     background-size: 220% 100%;
     animation: meter-flow 3s linear infinite;
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 1.35s var(--ease-spring);
+    transition-delay: 280ms;
 }
 
 /* ——— Sections ——— */
@@ -1446,6 +1685,19 @@ body.motion-ready .hero-backdrop {
     z-index: 1;
     overflow: hidden;
     padding: clamp(4rem, 10vw, 6rem) 0;
+}
+
+.section .container,
+.impact-panel .container {
+    transition: transform 0.18s linear;
+    will-change: transform;
+}
+
+.timeline,
+.skills-grid,
+.about-grid,
+.impact-grid {
+    perspective: 1400px;
 }
 
 .section-alt {
@@ -1468,6 +1720,8 @@ body.motion-ready .hero-backdrop {
 }
 
 .section-title {
+    position: relative;
+    display: inline-block;
     font-size: 2.25rem;
     font-weight: 700;
     letter-spacing: 0;
@@ -1541,6 +1795,13 @@ body.motion-ready .hero-backdrop {
     width: 2px;
     background: linear-gradient(180deg, var(--im-arc), var(--im-gold), var(--im-red));
     box-shadow: 0 0 18px rgba(92, 225, 255, 0.2);
+    transform-origin: top center;
+    transform: scaleY(0);
+    transition: transform 1.4s var(--ease-out);
+}
+
+.timeline.is-line-drawn::before {
+    transform: scaleY(1);
 }
 
 .timeline-item {
@@ -1826,6 +2087,10 @@ body.motion-ready .hero-backdrop {
     background-size: 220% 100%;
     box-shadow: 0 0 12px rgba(92, 225, 255, 0.32);
     animation: meter-flow 3s linear infinite;
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 1.25s var(--ease-spring);
+    transition-delay: var(--reveal-delay, 180ms);
 }
 
 @keyframes meter-flow {
