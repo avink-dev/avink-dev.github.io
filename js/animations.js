@@ -44,12 +44,12 @@
                 const progress = scrollY / heroLimit;
 
                 if (heroCopy) {
-                    heroCopy.style.transform = `translate3d(0, ${scrollY * 0.42}px, 0) scale(${1 - progress * 0.06})`;
-                    heroCopy.style.opacity = String(Math.max(0.25, 1 - progress * 0.85));
+                    heroCopy.style.transform = `translate3d(0, ${scrollY * 0.28}px, 0) scale(${1 - progress * 0.04})`;
+                    heroCopy.style.opacity = String(Math.max(0.45, 1 - progress * 0.55));
                 }
                 if (heroVisual) {
-                    heroVisual.style.transform = `translate3d(0, ${scrollY * 0.22}px, 0) scale(${1 - progress * 0.1}) rotate(${progress * 2}deg)`;
-                    heroVisual.style.opacity = String(Math.max(0.35, 1 - progress * 0.75));
+                    heroVisual.style.transform = `translate3d(0, ${scrollY * 0.16}px, 0) scale(${1 - progress * 0.06}) rotate(${progress * 1.2}deg)`;
+                    heroVisual.style.opacity = String(Math.max(0.55, 1 - progress * 0.5));
                 }
             }
 

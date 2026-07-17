@@ -78,6 +78,7 @@ html[data-theme="dark"] {
     .arc-core,
     .arc-pulse,
     .status-dot,
+    .hero-eyebrow::before,
     .orbit-ring,
     .hud-line,
     .hud-schematic,
@@ -1055,6 +1056,38 @@ body.motion-ready .hero-backdrop {
     color: var(--text);
 }
 
+.hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.85rem;
+    padding: 0.35rem 0.85rem;
+    border: 1px solid rgba(92, 225, 255, 0.22);
+    border-radius: 999px;
+    background: linear-gradient(135deg, rgba(92, 225, 255, 0.08), rgba(212, 160, 23, 0.06));
+    width: fit-content;
+}
+
+.hero-eyebrow::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--im-arc);
+    box-shadow: 0 0 8px var(--im-arc-glow);
+    animation: status-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes status-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.55; transform: scale(0.85); }
+}
+
 .hero-role {
     font-size: 1.125rem;
     color: var(--text-secondary);
@@ -1776,6 +1809,33 @@ body.motion-ready .hero-backdrop {
     font-weight: 600;
 }
 
+.about-highlights {
+    list-style: none;
+    display: grid;
+    gap: 0.65rem;
+    margin-top: 0.25rem;
+}
+
+.about-highlights li {
+    position: relative;
+    padding-left: 1.35rem;
+    color: var(--text-secondary);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+}
+
+.about-highlights li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--im-arc), var(--im-gold));
+    box-shadow: 0 0 6px rgba(92, 225, 255, 0.35);
+}
+
 /* Timeline */
 .timeline {
     position: relative;
@@ -2133,6 +2193,11 @@ body.motion-ready .hero-backdrop {
     gap: 1.25rem;
 }
 
+.education-grid--single {
+    max-width: 480px;
+    margin-inline: auto;
+}
+
 .education-card {
     position: relative;
     overflow: hidden;
@@ -2162,12 +2227,6 @@ body.motion-ready .hero-backdrop {
 }
 
 .education-card:nth-child(1)::before {
-    content: 'AI';
-    font-size: 0.78rem;
-    font-weight: 800;
-}
-
-.education-card:nth-child(2)::before {
     content: 'EC';
     font-size: 0.78rem;
     font-weight: 800;

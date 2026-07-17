@@ -15,7 +15,7 @@ The site is built as a static GitHub Pages portfolio with a polished interactive
 - IFS Apps 8, 9, 10, and IFS Cloud delivery background
 - Experience with IFS Aurena, Base Server, AFP, Oracle Database, PL/SQL, Boomi integrations, web services, reporting, packaging, deployment, and L3 support
 - Onsite consulting experience in Adelaide for a defense client
-- M.Tech in Artificial Intelligence and Machine Learning from BITS Pilani WILP
+- B.Tech in Electronics & Communication Engineering
 
 ## Features
 
@@ -47,7 +47,7 @@ The site is built as a static GitHub Pages portfolio with a polished interactive
 - **About**: Professional summary and consulting focus
 - **Experience**: PwC, Xitricon, Tietoevry, and Capgemini timeline
 - **Skills**: IFS ERP development, integrations, deployment, reporting, data, development, communication, support, and delivery skills
-- **Education**: M.Tech in AI/ML and B.Tech in Electronics & Communication
+- **Education**: B.Tech in Electronics & Communication
 - **Certifications & Awards**: IFS certifications and STAR Award
 - **Contact**: Current role, GitHub, LinkedIn, resume download, and message draft form
 

@@ -88,7 +88,7 @@ function runLoader() {
         return;
     }
 
-    const duration = 2600;
+    const duration = 2200;
     const start = performance.now();
     let lastLine = -1;
 
@@ -347,6 +347,8 @@ document.querySelectorAll('[data-profile-photo]').forEach(photo => {
 });
 
 // ——— Smooth anchor scroll ———
+const NAV_SCROLL_OFFSET = 88;
+
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', e => {
         const href = anchor.getAttribute('href');
@@ -356,9 +358,11 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         if (!target) return;
 
         e.preventDefault();
-        target.scrollIntoView({
-            behavior: prefersReducedMotion ? 'auto' : 'smooth',
-            block: 'start'
+        const top = target.getBoundingClientRect().top + window.scrollY - NAV_SCROLL_OFFSET;
+
+        window.scrollTo({
+            top: Math.max(0, top),
+            behavior: prefersReducedMotion ? 'auto' : 'smooth'
         });
     });
 });
