@@ -184,6 +184,55 @@
 
     startTypewriter();
 
+    function setupHero3D() {
+        const heroVisual = document.querySelector('.hero-visual');
+        if (!heroVisual || prefersReducedMotion || !finePointer) return;
+
+        const style = document.createElement('style');
+        style.textContent = `
+            .hero-visual {
+                perspective: 1100px;
+                transform-style: preserve-3d;
+                rotate: var(--hero-3d-rotation, none);
+                transition: rotate 180ms ease-out;
+            }
+            .hero-visual > .profile-card,
+            .hero-visual > .orbit-system,
+            .hero-visual > .data-chip {
+                transform-style: preserve-3d;
+                will-change: translate;
+            }
+            .hero-visual > .profile-card { translate: 0 0 32px; }
+            .hero-visual > .orbit-system { translate: 0 0 -24px; }
+            .hero-visual > .data-chip { translate: 0 0 48px; }
+            @media (prefers-reduced-motion: reduce) {
+                .hero-visual { perspective: none; rotate: none; }
+                .hero-visual > .profile-card,
+                .hero-visual > .orbit-system,
+                .hero-visual > .data-chip { translate: none; }
+            }
+        `;
+        document.head.append(style);
+
+        function updateScene(event) {
+            const bounds = heroVisual.getBoundingClientRect();
+            const x = (event.clientX - bounds.left) / bounds.width - 0.5;
+            const y = (event.clientY - bounds.top) / bounds.height - 0.5;
+            const axisX = Math.max(-1, Math.min(1, -y));
+            const axisY = Math.max(-1, Math.min(1, x));
+            const angle = Math.hypot(axisX, axisY) * 5;
+
+            heroVisual.style.setProperty('--hero-3d-rotation', `${axisX} ${axisY} 0 ${angle}deg`);
+        }
+
+        heroVisual.addEventListener('pointermove', updateScene, { passive: true });
+        heroVisual.addEventListener('pointerleave', () => {
+            heroVisual.style.setProperty('--hero-3d-rotation', 'none');
+        });
+    }
+
+    setupHero3D();
+
     function setupTiltCards() {
         if (prefersReducedMotion || !finePointer) return;
 
